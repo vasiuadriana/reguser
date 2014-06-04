@@ -23,6 +23,6 @@ class GenerateUsernameTestCase(TestCase):
             for i in range(100):
                 username = generate_username(email)
                 self.assertTrue(len(username) > 1)
-                self.assertTrue(len(username) < 30)
+                self.assertFalse(len(username) > 30)
                 self.assertNotIn(username, usernames)
                 usernames.append(username)
