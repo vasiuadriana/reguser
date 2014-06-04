@@ -11,13 +11,15 @@ setup(
     version = '0.0.1a1',
     packages = find_packages(),
     include_package_data = True,
-#    setup_requires = [ "setuptools-git >= 1.0", ],
     license = 'GNU LESSER GENERAL PUBLIC LICENSE Version 3',
     description = 'Simple, clean and modern reusable app for Django user registration.',
     long_description = README,
     url = 'https://github.com/a115/reguser',
     author = 'Jordan Dimov / A115',
     author_email = 'jdimov@a115.co.uk',
+    install_requires = [
+        'shortuuid==0.4.2',
+        ],
     classifiers = [
         'Environment :: Web Environment',
         'Framework :: Django',
