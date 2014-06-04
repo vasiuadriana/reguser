@@ -1,0 +1,2 @@
+Reguser:
+    * Limit registration by list of email domains (whitelist and blacklist)
