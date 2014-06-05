@@ -1,6 +1,6 @@
 import re
 from django import forms
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import ugettext_lazy as _
 from reguser.utils import generate_username
@@ -33,13 +33,16 @@ class ExtendedUserCreationForm(UserCreationForm):
     first_name = forms.CharField(required = True, max_length = 30, label=_("First name"))
     last_name = forms.CharField(required = True, max_length = 30, label=_("Last name"))
     
+    class Meta:
+        from django.contrib.auth import get_user_model
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'email', 'password1', 'password2', 'username']
+
     def __init__(self, *args, **kwargs):
         """
         Changes the order of fields, and removes the username field.
         """
         super(UserCreationForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder = ['email', 'first_name', 'last_name',
-                                'password1', 'password2']
 
     def clean(self, *args, **kwargs):
         """

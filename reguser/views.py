@@ -1,5 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from reguser.forms import ExtendedUserCreationForm
 
-def register_user(request):
-    return HttpResponse('ok')
+def registration(request):
+    if request.method == 'POST':
+        form = ExtendedUserCreationForm(request.POST)
+        if form.is_valid():
+            return redirect('/')
+    else:
+        form = ExtendedUserCreationForm()
+    context = {'form': form}
+    return render(request, 'reguser/registration_form.html', context)

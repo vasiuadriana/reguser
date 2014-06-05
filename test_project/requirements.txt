@@ -6,3 +6,4 @@ Fabric
 webtest
 django-webtest
 model_mommy
+django-bootstrap-form
