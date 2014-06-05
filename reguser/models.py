@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import Signer, BadSignature
 
 class ReguserHelper(object):
@@ -23,10 +24,10 @@ class ReguserHelper(object):
         except BadSignature:
             return None
         try:
-            user = self.USER_MODEL.objects.get(user_pk)
+            user = self.USER_MODEL.objects.get(pk=user_pk)
             if user.is_active: return None
             user.is_active = True
             user.save()
             return user
-        except self.USER_MODEL.DoesNotExist:
+        except ObjectDoesNotExist:
             return None
