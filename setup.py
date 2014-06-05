@@ -19,6 +19,7 @@ setup(
     author_email = 'jdimov@a115.co.uk',
     install_requires = [
         'shortuuid==0.4.2',
+        'django-bootstrap-form==3.1',
         ],
     classifiers = [
         'Environment :: Web Environment',
