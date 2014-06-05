@@ -14,7 +14,7 @@ class UniqueUserEmailField(forms.EmailField):
         USER = get_user_model()
         super(forms.EmailField, self).validate(value)
         if USER.objects.filter(email=value).count() > 0:
-            raise forms.ValidationError(_("A user with this e-mail address already exists"))
+            raise forms.ValidationError(_("A user with this e-mail address already exists."))
 
 class ExtendedUserCreationForm(UserCreationForm):
     """

@@ -3,3 +3,5 @@ ipython
 django-extensions
 coverage
 Fabric
+webtest
+django-webtest
