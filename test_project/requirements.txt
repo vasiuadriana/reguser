@@ -5,3 +5,4 @@ coverage
 Fabric
 webtest
 django-webtest
+model_mommy
