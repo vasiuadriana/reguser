@@ -18,16 +18,12 @@ class ReguserHelper(object):
 
     def validate_activation_token(self, token):
         """ Activates the user and returns the user object if the token is valid. 
-        Otherwise, returns None. """
-        try:
-            user_pk = self.signer.unsign(token)
-        except BadSignature:
-            return None
-        try:
-            user = self.USER_MODEL.objects.get(pk=user_pk)
-            if user.is_active: return None
-            user.is_active = True
-            user.save()
-            return user
-        except ObjectDoesNotExist:
-            return None
+        Raises BadSignature if the token is invalid. Raises ObjectDoesNotExist 
+        if no user with the decoded ID exists in the database. Returns None if 
+        the user exists but is already active. """
+        user_pk = self.signer.unsign(token)
+        user = self.USER_MODEL.objects.get(pk=user_pk)
+        if user.is_active: return None
+        user.is_active = True
+        user.save()
+        return user
