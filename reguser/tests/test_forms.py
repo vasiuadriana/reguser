@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.exceptions import ObjectDoesNotExist
 from django import forms
 from reguser.forms import UniqueUserEmailField, ExtendedUserCreationForm
 
@@ -59,5 +60,24 @@ class ExtendedUserCreationFormTestCase(TestCase):
         self.assertIn(u"The two password fields didn't match.", form.errors['password2'])
 
     def test_valid_form_creates_user_when_saved(self):
-        form = ExtendedUserCreationForm(data=self.get_form_data())
+        data = self.get_form_data()
+        form = ExtendedUserCreationForm(data=data)
         self.assertTrue(form.is_valid())
+        user = form.save()
+        retrieved_user = self.USER_MODEL.objects.get(pk=user.pk)
+        self.assertEqual(retrieved_user.email, data['email'])
+        self.assertEqual(retrieved_user.first_name, data['first_name'])
+        self.assertEqual(retrieved_user.last_name, data['last_name'])
+        self.assertTrue(len(retrieved_user.username) > 1)
+
+    def test_valid_form_does_not_save_user_when_commit_is_false(self):
+        data = self.get_form_data()
+        form = ExtendedUserCreationForm(data=data)
+        self.assertTrue(form.is_valid())
+        user = form.save(commit=False)
+        self.assertEqual(user.email, data['email'])
+        self.assertEqual(user.first_name, data['first_name'])
+        self.assertEqual(user.last_name, data['last_name'])
+        self.assertTrue(len(user.username) > 1)
+        with self.assertRaises(ObjectDoesNotExist):
+            self.USER_MODEL.objects.get(username=user.username)
