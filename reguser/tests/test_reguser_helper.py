@@ -16,6 +16,15 @@ class ReguserHelperTestCase(TestCase):
         new_user = self.helper.USER_MODEL.objects.get(pk=user_id)
         self.assertFalse(new_user.is_active)
 
+    def test_helper_sets_extra_attributes_on_user(self):
+        token = self.helper.create_inactive_user('mojojojo2', 'mojo@jojo.hum', 'sikrit', 
+                first_name='Mojo', last_name='Jojo')
+        user_id = ReguserHelper().signer.unsign(token)
+        new_user = self.helper.USER_MODEL.objects.get(pk=user_id)
+        self.assertFalse(new_user.is_active)
+        self.assertEqual(new_user.first_name, 'Mojo')
+        self.assertEqual(new_user.last_name, 'Jojo')
+
     def test_validate_raises_exception_with_tampered_user_id(self):
         parts = self.token_parts
         # Mangle the user ID

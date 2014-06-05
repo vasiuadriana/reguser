@@ -17,30 +17,47 @@ class UniqueEmailFieldTestCase(TestCase):
                 {'test@me.com': [u'A user with this e-mail address already exists.']})
 
 class ExtendedUserCreationFormTestCase(TestCase):
+    
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        self.field = UniqueUserEmailField
+        self.USER_MODEL = get_user_model()
+
+    def get_form_data(*args, **kwargs):
+        data = {'email': 'test@me.com',
+                'first_name': 'Test',
+                'last_name': 'Me',
+                'password1': 'myPass',
+                'password2': 'myPass'}
+        data.update(**kwargs)
+        return data
 
     def test_form_is_valid_for_valid_input(self):
-        data = {'email': 'test@me.com',
-                'first_name': 'Test',
-                'last_name': 'Me',
-                'password1': 'myPass',
-                'password2': 'myPass'}
-        form = ExtendedUserCreationForm(data=data)
+        form = ExtendedUserCreationForm(data=self.get_form_data())
         self.assertTrue(form.is_valid())
 
+    def test_valid_form_generates_username(self):
+        form = ExtendedUserCreationForm(data=self.get_form_data())
+        self.assertTrue(form.is_valid())
+        self.assertIn('username', form.cleaned_data)
+        self.assertTrue(len(form.cleaned_data['username']) > 1)
+
     def test_form_validation_fails_for_invalid_email(self):
-        data = {'email': 'testme.com',
-                'first_name': 'Test',
-                'last_name': 'Me',
-                'password1': 'myPass',
-                'password2': 'myPass'}
-        form = ExtendedUserCreationForm(data=data)
+        form = ExtendedUserCreationForm(data=self.get_form_data(email='testme.com'))
         self.assertFalse(form.is_valid())
+        self.assertIn(u"Enter a valid email address.", form.errors['email'])
+
+    def test_form_validation_fails_for_duplicate_email(self):
+        self.USER_MODEL.objects.create_user('test', 'existing@me.com', 'passwd')
+        form = ExtendedUserCreationForm(data=self.get_form_data(email='existing@me.com'))
+        self.assertFalse(form.is_valid())
+        self.assertIn(u"A user with this e-mail address already exists.", form.errors['email'])
 
     def test_form_validation_fails_for_mismatched_passwords(self):
-        data = {'email': 'test@me.com',
-                'first_name': 'Test',
-                'last_name': 'Me',
-                'password1': 'myPass1',
-                'password2': 'myPass2'}
-        form = ExtendedUserCreationForm(data=data)
+        form = ExtendedUserCreationForm(data=self.get_form_data(password2='myPass2'))
         self.assertFalse(form.is_valid())
+        self.assertIn(u"The two password fields didn't match.", form.errors['password2'])
+
+    def test_valid_form_creates_user_when_saved(self):
+        form = ExtendedUserCreationForm(data=self.get_form_data())
+        self.assertTrue(form.is_valid())

@@ -9,10 +9,12 @@ class ReguserHelper(object):
         self.signer = Signer(salt='reguser') # do not change
 
     @transaction.atomic
-    def create_inactive_user(self, username, email, password):
+    def create_inactive_user(self, username, email, password, **kwargs):
         """ Creates a new inactive user and returns a signed activation token """
         user = self.USER_MODEL.objects.create_user(username, email, password)
         user.is_active = False
+        for k,v in kwargs.iteritems():
+            setattr(user, k, v)
         user.save()
         return self.signer.sign(user.pk)
 
