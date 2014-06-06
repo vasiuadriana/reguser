@@ -21,3 +21,11 @@ class RegistrationTestCase(WebTest):
         response.mustcontain('error', 'This field is required.')
         response_form = response.form
         self.assertEqual(response_form['first_name'].value, 'Mojo')
+
+    def test_invalid_email_in_registration_form(self):
+        form = self.registration_page.form
+        form['email'] = 'mojojojo.com'
+        response = form.submit()
+        response.mustcontain('error', 'Enter a valid email address.')
+        response_form = response.form
+        self.assertEqual(response_form['email'].value, 'mojojojo.com')

@@ -4,16 +4,28 @@ from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import ugettext_lazy as _
 from reguser.utils import generate_username
 
-class UniqueUserEmailField(forms.EmailField):
+class WhitelistFieldMixin(object):
+    def __init__(self):
+        self._whitelist = []
+    def get_whitelist(self):
+        return self._whitelist
+    def set_whitelist(self, domains):
+        self._whitelist = [d.lower() for d in domains]
+    whitelist = property(get_whitelist, set_whitelist)
+
+class UniqueUserEmailField(forms.EmailField, WhitelistFieldMixin):
     """
     An EmailField which is only valid if no User has that email.
     """
     def validate(self, value):
         from django.contrib.auth import get_user_model
         USER = get_user_model()
-        super(forms.EmailField, self).validate(value)
-        if USER.objects.filter(email=value).count() > 0:
-            raise forms.ValidationError(_("A user with this e-mail address already exists."))
+        super(UniqueUserEmailField, self).validate(value)
+        if value:
+            if self.whitelist and ('@' in value) and (value.rsplit('@', 1)[1] not in self.whitelist):
+                raise forms.ValidationError(_("Only e-mail addresses from participating universities are allowed."))
+            if USER.objects.filter(email=value).count() > 0:
+                raise forms.ValidationError(_("A user with this e-mail address already exists."))
 
 class ExtendedUserCreationForm(UserCreationForm):
     """
@@ -38,10 +50,9 @@ class ExtendedUserCreationForm(UserCreationForm):
         fields = ['first_name', 'last_name', 'email', 'password1', 'password2', 'username']
 
     def __init__(self, *args, **kwargs):
-        """
-        Changes the order of fields, and removes the username field.
-        """
+        whitelist = kwargs.pop('ALLOWED_EMAIL_DOMAINS', [])
         super(UserCreationForm, self).__init__(*args, **kwargs)
+        self.fields['email'].whitelist = whitelist
 
     def clean(self, *args, **kwargs):
         """

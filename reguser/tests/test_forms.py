@@ -37,6 +37,10 @@ class ExtendedUserCreationFormTestCase(TestCase):
         form = ExtendedUserCreationForm(data=self.get_form_data())
         self.assertTrue(form.is_valid())
 
+    def test_form_is_valid_for_valid_input_with_whitelist(self):
+        form = ExtendedUserCreationForm(data=self.get_form_data(), ALLOWED_EMAIL_DOMAINS=['me.com'])
+        self.assertTrue(form.is_valid())
+
     def test_valid_form_generates_username(self):
         form = ExtendedUserCreationForm(data=self.get_form_data())
         self.assertTrue(form.is_valid())
@@ -47,6 +51,11 @@ class ExtendedUserCreationFormTestCase(TestCase):
         form = ExtendedUserCreationForm(data=self.get_form_data(email='testme.com'))
         self.assertFalse(form.is_valid())
         self.assertIn(u"Enter a valid email address.", form.errors['email'])
+
+    def test_form_validation_fails_for_email_not_in_whitelist(self):
+        form = ExtendedUserCreationForm(data=self.get_form_data(email='test@me.com'), ALLOWED_EMAIL_DOMAINS=['allowed.com'])
+        self.assertFalse(form.is_valid())
+        self.assertIn(u"Only e-mail addresses from participating universities are allowed.", form.errors['email'])
 
     def test_form_validation_fails_for_duplicate_email(self):
         self.USER_MODEL.objects.create_user('test', 'existing@me.com', 'passwd')
