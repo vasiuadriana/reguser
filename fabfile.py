@@ -3,14 +3,9 @@ import os
 
 TEST_PROJECT_DIR = os.path.join(os.path.dirname(env.real_fabfile), 'test_project')
 
-def test(app=""):
+def test():
     with lcd(TEST_PROJECT_DIR):
-        coverage_cmd = "coverage run "
-        if app:
-            coverage_cmd += "--source='../{}/' ".format(app)
-        else:
-            coverage_cmd += "--source='.' "
-        local(coverage_cmd + "manage.py test -v 2 " + app)
+        local("coverage run --source='../reguser/' manage.py test -v 2 ")
         local("coverage report")
 
 def run_server():
