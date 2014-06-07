@@ -38,3 +38,8 @@ class RegistrationTestCase(WebTest):
         response.mustcontain('error', 'Only e-mail addresses from the following domains are allowed: test.com')
         response_form = response.form
         self.assertEqual(response_form['email'].value, 'mojo@jojo.com')
+
+    def test_f_using_custom_registration_form_template(self):
+        registration_page = self.app.get(reverse('test-cherry-registration'))
+        registration_page.mustcontain('Cherry User Registration', 'Registration Form', 'Register', 'POST', 
+                'csrfmiddlewaretoken', no=['error'])
