@@ -30,7 +30,6 @@ class UniqueUserEmailField(forms.EmailField, WhitelistFieldMixin):
             domain_is_valid = False
             for pattern in self.whitelist:
                 pattern = pattern.strip('!')
-                print 'checking pattern: ', pattern
                 if (pattern.startswith('.') and domain.endswith(pattern)) or (
                         (not pattern.startswith('.')) and (domain == pattern)):
                     domain_is_valid = True
