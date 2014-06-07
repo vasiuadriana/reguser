@@ -4,6 +4,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import ugettext_lazy as _
 from reguser.utils import generate_username
 
+EMAIL_WHITELIST_ERROR_MESSAGE = _("Only e-mail addresses from the following domains are allowed: ")
+
 class WhitelistFieldMixin(object):
     def __init__(self):
         self._whitelist = []
@@ -22,8 +24,12 @@ class UniqueUserEmailField(forms.EmailField, WhitelistFieldMixin):
         USER = get_user_model()
         super(UniqueUserEmailField, self).validate(value)
         if value:
-            if self.whitelist and ('@' in value) and (value.rsplit('@', 1)[1] not in self.whitelist):
-                raise forms.ValidationError(_("Only e-mail addresses from participating universities are allowed."))
+            if self.whitelist and ('@' in value):
+                domain = value.rsplit('@', 1)[1]
+                for pattern in self.whitelist:
+                    if ((pattern.startswith('.') and (not domain.endswith(pattern))) or 
+                        ((not pattern.startswith('.')) and (domain != pattern))):
+                        raise forms.ValidationError(EMAIL_WHITELIST_ERROR_MESSAGE + ','.join(self.whitelist))
             if USER.objects.filter(email=value).count() > 0:
                 raise forms.ValidationError(_("A user with this e-mail address already exists."))
 

@@ -35,6 +35,6 @@ class RegistrationTestCase(WebTest):
         form = registration_whitelist_page.form
         form['email'] = 'mojo@jojo.com'
         response = form.submit()
-        response.mustcontain('error', 'Only e-mail addresses from participating universities are allowed.')
+        response.mustcontain('error', 'Only e-mail addresses from the following domains are allowed: test.com')
         response_form = response.form
         self.assertEqual(response_form['email'].value, 'mojo@jojo.com')
