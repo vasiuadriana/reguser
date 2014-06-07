@@ -11,6 +11,7 @@ This app differs from the popular django-registration package in the following w
 
   * actively maintained and supports the latest version of Django;
   * uses cryptographic signing instead of storing Registration Profiles in the database;
+  * uses email addresses instead of usernames by dafult and allows whitelisting of email domains for which users can register;
   * comes with useful basic templates!
   * is cleaner, simpler and easier to work with. 
 
