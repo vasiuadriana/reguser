@@ -47,3 +47,5 @@ If you want to limit user registration for email addresses from specific domains
     
     url(r'^reguser/register/$', 'reguser.views.registration',
         kwargs={'whitelist': ['mydomain.com',]}),
+
+To allow sub-domains, include a dot at the beginning of the domain pattern, e.g.: `'.mydomain.com'`
