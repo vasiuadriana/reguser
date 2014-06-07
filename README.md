@@ -41,3 +41,9 @@ The simplest way to use the app is to hook it up to an endpoint in your urls.py,
     url(r'^accounts/', include('reguser.urls')),
 
 Then run your server and hit `/accounts/register/`
+
+If you want to limit user registration for email addresses from specific domains, provide a whitelist parameter to the registration view, like this:
+
+    
+    url(r'^reguser/register/$', 'reguser.views.registration',
+        kwargs={'whitelist': ['mydomain.com',]}),
