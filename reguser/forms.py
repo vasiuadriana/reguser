@@ -23,15 +23,19 @@ class UniqueUserEmailField(forms.EmailField, WhitelistFieldMixin):
         from django.contrib.auth import get_user_model
         USER = get_user_model()
         super(UniqueUserEmailField, self).validate(value)
-        if value:
-            if self.whitelist and ('@' in value):
-                domain = value.rsplit('@', 1)[1]
-                for pattern in self.whitelist:
-                    if ((pattern.startswith('.') and (not domain.endswith(pattern))) or 
-                        ((not pattern.startswith('.')) and (domain != pattern))):
-                        raise forms.ValidationError(EMAIL_WHITELIST_ERROR_MESSAGE + ','.join(self.whitelist))
-            if USER.objects.filter(email=value).count() > 0:
-                raise forms.ValidationError(_("A user with this e-mail address already exists."))
+        if '@' not in value: return
+        # check for e-mail domain validation
+        if self.whitelist:
+            domain = value.rsplit('@', 1)[1]
+            for pattern in self.whitelist:
+                pattern = pattern.strip('!')
+                if ((pattern.startswith('.') and (not domain.endswith(pattern))) or 
+                    ((not pattern.startswith('.')) and (domain != pattern))):
+                    show_whitelist = ','.join(d for d in self.whitelist if not d.endswith('!'))
+                    raise forms.ValidationError(EMAIL_WHITELIST_ERROR_MESSAGE + show_whitelist)
+        # check for duplicate emails
+        if USER.objects.filter(email=value).count() > 0:
+            raise forms.ValidationError(_("A user with this e-mail address already exists."))
 
 class ExtendedUserCreationForm(UserCreationForm):
     """
