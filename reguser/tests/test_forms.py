@@ -38,11 +38,19 @@ class ExtendedUserCreationFormTestCase(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_form_is_valid_for_valid_input_with_whitelist(self):
-        form = ExtendedUserCreationForm(data=self.get_form_data(), ALLOWED_EMAIL_DOMAINS=['me.com'])
+        form = ExtendedUserCreationForm(data=self.get_form_data(), ALLOWED_EMAIL_DOMAINS=['other.com', 'me.com'])
         self.assertTrue(form.is_valid())
 
     def test_form_is_valid_for_valid_input_with_whitelist_subdomain(self):
-        form = ExtendedUserCreationForm(data=self.get_form_data(email="jojo@find.me.com"), ALLOWED_EMAIL_DOMAINS=['.me.com'])
+        form = ExtendedUserCreationForm(data=self.get_form_data(email="jojo@find.me.com"), ALLOWED_EMAIL_DOMAINS=['.me.com', '.other.com'])
+        self.assertTrue(form.is_valid())
+    
+    def test_form_is_valid_for_valid_input_with_whitelist_hidden_domain(self):
+        form = ExtendedUserCreationForm(data=self.get_form_data(email="jojo@hide.com"), ALLOWED_EMAIL_DOMAINS=['hide.com!', 'me.com'])
+        self.assertTrue(form.is_valid())
+
+    def test_form_is_valid_for_valid_input_with_whitelist_hidden_subdomain(self):
+        form = ExtendedUserCreationForm(data=self.get_form_data(email="jojo@i.hide.com"), ALLOWED_EMAIL_DOMAINS=['.hide.com!', 'me.com'])
         self.assertTrue(form.is_valid())
 
     def test_valid_form_generates_username(self):
@@ -57,9 +65,9 @@ class ExtendedUserCreationFormTestCase(TestCase):
         self.assertIn(u"Enter a valid email address.", form.errors['email'])
 
     def test_form_validation_fails_for_email_not_in_whitelist(self):
-        form = ExtendedUserCreationForm(data=self.get_form_data(email='test@me.com'), ALLOWED_EMAIL_DOMAINS=['allowed.com'])
+        form = ExtendedUserCreationForm(data=self.get_form_data(email='test@me.com'), ALLOWED_EMAIL_DOMAINS=['allowed.com', 'allowed2.com'])
         self.assertFalse(form.is_valid())
-        self.assertIn(u"Only e-mail addresses from the following domains are allowed: allowed.com", form.errors['email'])
+        self.assertIn(u"Only e-mail addresses from the following domains are allowed: allowed.com, allowed2.com", form.errors['email'])
     
     def test_hidden_whitelist_domain_not_shown_in_error_message(self):
         form = ExtendedUserCreationForm(data=self.get_form_data(email='test@not.allowed.com'), ALLOWED_EMAIL_DOMAINS=['allowed.com', 'hidden.com!'])

@@ -27,12 +27,17 @@ class UniqueUserEmailField(forms.EmailField, WhitelistFieldMixin):
         # check for e-mail domain validation
         if self.whitelist:
             domain = value.rsplit('@', 1)[1]
+            domain_is_valid = False
             for pattern in self.whitelist:
                 pattern = pattern.strip('!')
-                if ((pattern.startswith('.') and (not domain.endswith(pattern))) or 
-                    ((not pattern.startswith('.')) and (domain != pattern))):
-                    show_whitelist = ','.join(d for d in self.whitelist if not d.endswith('!'))
-                    raise forms.ValidationError(EMAIL_WHITELIST_ERROR_MESSAGE + show_whitelist)
+                print 'checking pattern: ', pattern
+                if (pattern.startswith('.') and domain.endswith(pattern)) or (
+                        (not pattern.startswith('.')) and (domain == pattern)):
+                    domain_is_valid = True
+                    break
+            if not domain_is_valid:
+                show_whitelist = ', '.join(d for d in self.whitelist if not d.endswith('!'))
+                raise forms.ValidationError(EMAIL_WHITELIST_ERROR_MESSAGE + show_whitelist)
         # check for duplicate emails
         if USER.objects.filter(email=value).count() > 0:
             raise forms.ValidationError(_("A user with this e-mail address already exists."))
