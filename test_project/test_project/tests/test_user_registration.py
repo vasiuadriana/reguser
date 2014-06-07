@@ -1,5 +1,7 @@
 from django_webtest import WebTest
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User, Group
 
 class RegistrationTestCase(WebTest):
     def setUp(self):
@@ -18,7 +20,10 @@ class RegistrationTestCase(WebTest):
         form = self.registration_page.form
         form['first_name'] = 'Mojo'
         response = form.submit()
-        response.mustcontain('error', 'This field is required.')
+        expected_error_msg = "This field is required."
+        response.mustcontain('error', expected_error_msg)
+        for field in ['last_name', 'email', 'password1', 'password2']:
+            self.assertFormError(response, 'form', field, expected_error_msg)
         response_form = response.form
         self.assertEqual(response_form['first_name'].value, 'Mojo')
 
@@ -26,7 +31,9 @@ class RegistrationTestCase(WebTest):
         form = self.registration_page.form
         form['email'] = 'mojojojo.com'
         response = form.submit()
-        response.mustcontain('error', 'Enter a valid email address.')
+        expected_error_msg = "Enter a valid email address."
+        response.mustcontain('error', expected_error_msg)
+        self.assertFormError(response, 'form', 'email', expected_error_msg)
         response_form = response.form
         self.assertEqual(response_form['email'].value, 'mojojojo.com')
 
@@ -35,7 +42,9 @@ class RegistrationTestCase(WebTest):
         form = registration_whitelist_page.form
         form['email'] = 'mojo@jojo.com'
         response = form.submit()
-        response.mustcontain('error', 'Only e-mail addresses from the following domains are allowed: test.com')
+        expected_error_msg = u"Only e-mail addresses from the following domains are allowed: test.com"
+        response.mustcontain('error', expected_error_msg)
+        self.assertFormError(response, 'form', 'email', expected_error_msg)
         response_form = response.form
         self.assertEqual(response_form['email'].value, 'mojo@jojo.com')
 
@@ -43,3 +52,34 @@ class RegistrationTestCase(WebTest):
         registration_page = self.app.get(reverse('test-cherry-registration'))
         registration_page.mustcontain('Cherry User Registration', 'Registration Form', 'Register', 'POST', 
                 'csrfmiddlewaretoken', no=['error'])
+
+    def test_f_when_valid_form_is_submitted_inactive_user_is_created(self):
+        form = self.registration_page.form
+        with (self.assertRaises(ObjectDoesNotExist)):
+            User.objects.get(email='mojo@jojo.com')
+        form['first_name'] = 'Mojo'
+        form['last_name'] = 'Jojo'
+        form['email'] = 'mojo@jojo.com'
+        form['password1'] = 'moPass'
+        form['password2'] = 'moPass'
+        response = form.submit().follow()
+        user = User.objects.get(email='mojo@jojo.com')
+        self.assertEqual(user.first_name, 'Mojo')
+        self.assertEqual(user.last_name, 'Jojo')
+        self.assertFalse(user.is_active)
+
+    def test_f_when_valid_form_is_submitted_inactive_user_is_created_with_group(self):
+        vip_page = self.app.get(reverse('test-vip-registration'))
+        form = registration_whitelist_page.form
+        with (self.assertRaises(ObjectDoesNotExist)):
+            User.objects.get(email='mojo@jojo.com')
+        form['first_name'] = 'Mojo'
+        form['last_name'] = 'Jojo'
+        form['email'] = 'm@jojo.com'
+        form['password1'] = 'moPass'
+        form['password2'] = 'moPass'
+        response = form.submit().follow()
+        user = User.objects.get(email='mo@jojo.com')
+        self.assertEqual(user.first_name, 'Mojo')
+        self.assertEqual(user.last_name, 'Jojo')
+        self.assertFalse(user.is_active)

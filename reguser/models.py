@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import Signer, BadSignature
+from django.contrib.auth.models import Group
 
 class ReguserHelper(object):
     def __init__(self):
@@ -9,13 +10,16 @@ class ReguserHelper(object):
         self.signer = Signer(salt='reguser') # do not change
 
     @transaction.atomic
-    def create_inactive_user(self, username, email, password, **kwargs):
+    def create_inactive_user(self, username, email, password, groups=[], attrs={}):
         """ Creates a new inactive user and returns a signed activation token """
         user = self.USER_MODEL.objects.create_user(username, email, password)
         user.is_active = False
-        for k,v in kwargs.iteritems():
+        for k,v in attrs.iteritems():
             setattr(user, k, v)
         user.save()
+        for group_name in groups:
+            group, created = Group.objects.get_or_create(name=group_name)
+            group.user_set.add(user)
         return self.signer.sign(user.pk)
 
     def validate_activation_token(self, token):
