@@ -42,8 +42,14 @@ The simplest way to use the app is to hook it up to an endpoint in your urls.py,
 
 Then run your server and hit `/accounts/register/`
 
-If you want to limit user registration for email addresses from specific domains, provide a whitelist parameter to the registration view, like this:
+To use a custom template for the registration form, use:
 
+    url(r'^accounts/register/$', 'reguser.views.registration', name='custom-registration',
+        kwargs={'template': 'my_custom_registration_form.html'}),
+
+Note that the custom template must live under 'reguser' in your templates directory. 
+
+If you want to limit user registration for email addresses from specific domains, provide a whitelist parameter to the registration view, like this:
     
     url(r'^reguser/register/$', 'reguser.views.registration',
         kwargs={'whitelist': ['mydomain.com',]}),
