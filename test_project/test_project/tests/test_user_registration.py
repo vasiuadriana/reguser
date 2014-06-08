@@ -1,21 +1,16 @@
+# -*- coding: utf-8 -*-
 from django_webtest import WebTest
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
+from lunchbag.testutils import WebtestHelperMixin
 
-class RegistrationTestCase(WebTest):
+class RegistrationTestCase(WebTest, WebtestHelperMixin):
     def setUp(self):
         self.registration_page = self.app.get(reverse('test-registration'))
-
-    def fill_in_form(self, form, **kwargs):
-        form['first_name'] = 'Mojo'
-        form['last_name'] = 'Jojo'
-        form['email'] = 'mojo@jojo.com'
-        form['password1'] = 'moPass'
-        form['password2'] = 'moPass'
-        for k,v in kwargs.iteritems():
-            form[k] = v
+        self.set_default_form_values(first_name = u"Mojo", last_name = u"Джоджо",
+                email = u"mojo@jojo.com", password1 = u"moPass", password2 = u"moPass")
 
     def test_f_registration_url_returns_registration_form(self):
         self.registration_page.mustcontain('Registration Form', 'Register', 'POST', 
@@ -70,8 +65,8 @@ class RegistrationTestCase(WebTest):
         self.fill_in_form(form)
         response = form.submit().follow()
         user = User.objects.get(email='mojo@jojo.com')
-        self.assertEqual(user.first_name, 'Mojo')
-        self.assertEqual(user.last_name, 'Jojo')
+        self.assertEqual(user.first_name, u"Mojo")
+        self.assertEqual(user.last_name, u"Джоджо")
         self.assertFalse(user.is_active)
 
     def test_f_when_valid_form_is_submitted_inactive_user_is_created_with_group(self):
@@ -82,8 +77,8 @@ class RegistrationTestCase(WebTest):
         self.fill_in_form(form, email="m@jojo.com")
         response = form.submit().follow()
         user = User.objects.get(email='m@jojo.com')
-        self.assertEqual(user.first_name, 'Mojo')
-        self.assertEqual(user.last_name, 'Jojo')
+        self.assertEqual(user.first_name, u"Mojo")
+        self.assertEqual(user.last_name, u"Джоджо")
         self.assertFalse(user.is_active)
         expected_group = Group.objects.get(name='VIP')
         self.assertIn(expected_group, user.groups.all())
