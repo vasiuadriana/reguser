@@ -98,4 +98,3 @@ class RegistrationTestCase(WebTest):
         self.assertEqual(msg.subject, u"Mojo, activate your registration!")
         self.assertTemplateUsed(response, "reguser/activation_email_subject.txt")
         self.assertTemplateUsed(response, "reguser/activation_email_body.txt")
-        print msg.body
