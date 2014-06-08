@@ -1,8 +1,7 @@
 from django.db import transaction
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.signing import Signer, BadSignature
 from django.template.loader import render_to_string
 from django.contrib.auth.models import Group
+from django.core.signing import Signer
 
 class ReguserHelper(object):
     def __init__(self):

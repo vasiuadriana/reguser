@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 from lunchbag.testutils import WebtestHelperMixin
+import re
 
 class RegistrationTestCase(WebTest, WebtestHelperMixin):
     def setUp(self):
@@ -89,7 +90,32 @@ class RegistrationTestCase(WebTest, WebtestHelperMixin):
         response = form.submit()
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
-        self.assertIn('mojo@jojo.com', msg.to)
+        self.assertIn(u"mojo@jojo.com", msg.to)
         self.assertEqual(msg.subject, u"Mojo, activate your registration!")
         self.assertTemplateUsed(response, "reguser/activation_email_subject.txt")
         self.assertTemplateUsed(response, "reguser/activation_email_body.txt")
+
+
+class RegistrationActivationTestCase(WebTest, WebtestHelperMixin):
+    def setUp(self):
+        self.registration_page = self.app.get(reverse('test-registration'))
+        self.set_default_form_values(first_name = u"Mojo", last_name = u"Jojo",
+                email = u"mojo@jojo.com", password1 = u"moPass", password2 = u"moPass")
+        self.form = self.registration_page.form
+        self.fill_in_form(self.form)
+        self.registration_response = self.form.submit()
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.token = re.search('t=(.+?)\s', msg.body).group(1)
+        self.activation_link = reverse('reguser-activate')
+
+
+    def test_f_invalid_activation_link(self):
+        token = self.token+'xxx' # Mangle the signature
+        response = self.app.get(self.activation_link, {'t': token}, status=404)
+        self.assertEqual(response.status_int, 404)
+
+    def test_f_invalid_username_in_activation_link(self):
+        User.objects.get(email=u"mojo@jojo.com").delete()
+        response = self.app.get(self.activation_link, {'t': self.token})
+        response.mustcontain("register again", reverse("reguser-registration"))

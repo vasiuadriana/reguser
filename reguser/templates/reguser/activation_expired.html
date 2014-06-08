@@ -1,0 +1,12 @@
+{% extends 'reguser/base.html' %}
+{% load bootstrap %}
+
+{% block content %}
+<div class="container">
+<h1>Activation link has expired</h1>
+<div>
+    <p>The user registration information for this activation link has been deleted from our website. </p>
+    <p>Please <a href="{% url "reguser-registration" %}">register again</a>.</p>
+</div>
+</div>
+{% endblock %}
