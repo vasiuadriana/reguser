@@ -109,7 +109,6 @@ class RegistrationActivationTestCase(WebTest, WebtestHelperMixin):
         self.token = re.search('t=(.+?)\s', msg.body).group(1)
         self.activation_link = reverse('reguser-activate')
 
-
     def test_f_invalid_activation_link(self):
         token = self.token+'xxx' # Mangle the signature
         response = self.app.get(self.activation_link, {'t': token}, status=404)
@@ -119,3 +118,10 @@ class RegistrationActivationTestCase(WebTest, WebtestHelperMixin):
         User.objects.get(email=u"mojo@jojo.com").delete()
         response = self.app.get(self.activation_link, {'t': self.token})
         response.mustcontain("register again", reverse("reguser-registration"))
+
+    def test_f_user_already_active(self):
+        user = User.objects.get(email=u"mojo@jojo.com")
+        user.is_active = True
+        user.save()
+        response = self.app.get(self.activation_link, {'t': self.token})
+        response.mustcontain("log in", reverse("reguser-login"))

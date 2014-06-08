@@ -1,0 +1,12 @@
+{% extends 'reguser/base.html' %}
+{% load bootstrap %}
+
+{% block content %}
+<div class="container">
+<h1>This user is already activated</h1>
+<div>
+    <p>This user has aleady been activated. </p>
+    <p>You can just <a href="{% url "reguser-login" %}">log in</a>.</p>
+</div>
+</div>
+{% endblock %}
