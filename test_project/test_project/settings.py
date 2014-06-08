@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'bootstrapform',
     'reguser',
+    'sample',
 )
 
 MIDDLEWARE_CLASSES = (
