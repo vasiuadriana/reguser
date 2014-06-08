@@ -7,7 +7,7 @@ class ReguserHelperTestCase(TestCase):
     def setUp(self):
         self.helper = ReguserHelper()
         self.helper2 = ReguserHelper()
-        self.token = self.helper.create_inactive_user('mojojojo', 'mojo@jojo.hum', 'sikrit')
+        self.token = self.helper.create_inactive_user('mojojojo', 'mojo@jojo.hum', 'sikrit').activation_token
         self.token_parts = self.token.partition(':')
         self.assertEqual(len(self.token_parts), 3)
 
@@ -18,7 +18,7 @@ class ReguserHelperTestCase(TestCase):
 
     def test_helper_sets_extra_attributes_on_user(self):
         token = self.helper.create_inactive_user('mojojojo2', 'mojo@jojo.hum', 'sikrit', 
-                attrs={'first_name': 'Mojo', 'last_name':'Jojo'})
+                attrs={'first_name': 'Mojo', 'last_name':'Jojo'}).activation_token
         user_id = ReguserHelper().signer.unsign(token)
         new_user = self.helper.USER_MODEL.objects.get(pk=user_id)
         self.assertFalse(new_user.is_active)

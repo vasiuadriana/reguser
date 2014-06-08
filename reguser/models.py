@@ -11,7 +11,8 @@ class ReguserHelper(object):
 
     @transaction.atomic
     def create_inactive_user(self, username, email, password, groups=[], attrs={}):
-        """ Creates a new inactive user and returns a signed activation token """
+        """ Creates a new inactive user and assings the supplied groups, if any. 
+        Generates a signed activation token """
         user = self.USER_MODEL.objects.create_user(username, email, password)
         user.is_active = False
         for k,v in attrs.iteritems():
@@ -20,7 +21,8 @@ class ReguserHelper(object):
         for group_name in groups:
             group, created = Group.objects.get_or_create(name=group_name)
             group.user_set.add(user)
-        return self.signer.sign(user.pk)
+        user.activation_token = self.signer.sign(user.pk)
+        return user
 
     def validate_activation_token(self, token):
         """ Activates the user and returns the user object if the token is valid. 

@@ -1,4 +1,5 @@
 from django_webtest import WebTest
+from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
@@ -6,6 +7,15 @@ from django.contrib.auth.models import User, Group
 class RegistrationTestCase(WebTest):
     def setUp(self):
         self.registration_page = self.app.get(reverse('test-registration'))
+
+    def fill_in_form(self, form, **kwargs):
+        form['first_name'] = 'Mojo'
+        form['last_name'] = 'Jojo'
+        form['email'] = 'mojo@jojo.com'
+        form['password1'] = 'moPass'
+        form['password2'] = 'moPass'
+        for k,v in kwargs.iteritems():
+            form[k] = v
 
     def test_f_registration_url_returns_registration_form(self):
         self.registration_page.mustcontain('Registration Form', 'Register', 'POST', 
@@ -57,11 +67,7 @@ class RegistrationTestCase(WebTest):
         form = self.registration_page.form
         with (self.assertRaises(ObjectDoesNotExist)):
             User.objects.get(email='mojo@jojo.com')
-        form['first_name'] = 'Mojo'
-        form['last_name'] = 'Jojo'
-        form['email'] = 'mojo@jojo.com'
-        form['password1'] = 'moPass'
-        form['password2'] = 'moPass'
+        self.fill_in_form(form)
         response = form.submit().follow()
         user = User.objects.get(email='mojo@jojo.com')
         self.assertEqual(user.first_name, 'Mojo')
@@ -73,11 +79,7 @@ class RegistrationTestCase(WebTest):
         form = vip_page.form
         with (self.assertRaises(ObjectDoesNotExist)):
             User.objects.get(email='m@jojo.com')
-        form['first_name'] = 'Mojo'
-        form['last_name'] = 'Jojo'
-        form['email'] = 'm@jojo.com'
-        form['password1'] = 'moPass'
-        form['password2'] = 'moPass'
+        self.fill_in_form(form, email="m@jojo.com")
         response = form.submit().follow()
         user = User.objects.get(email='m@jojo.com')
         self.assertEqual(user.first_name, 'Mojo')
@@ -85,3 +87,12 @@ class RegistrationTestCase(WebTest):
         self.assertFalse(user.is_active)
         expected_group = Group.objects.get(name='VIP')
         self.assertIn(expected_group, user.groups.all())
+
+    def test_f_when_valid_form_is_submitted_activation_email_is_sent(self):
+        form = self.registration_page.form
+        self.fill_in_form(form)
+        response = form.submit().follow()
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertIn('mojo@jojo.com', msg.to)
+        self.assertEqual(msg.subject, u"Mojo, activate your registration!")
