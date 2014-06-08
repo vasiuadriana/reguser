@@ -70,16 +70,18 @@ class RegistrationTestCase(WebTest):
 
     def test_f_when_valid_form_is_submitted_inactive_user_is_created_with_group(self):
         vip_page = self.app.get(reverse('test-vip-registration'))
-        form = registration_whitelist_page.form
+        form = vip_page.form
         with (self.assertRaises(ObjectDoesNotExist)):
-            User.objects.get(email='mojo@jojo.com')
+            User.objects.get(email='m@jojo.com')
         form['first_name'] = 'Mojo'
         form['last_name'] = 'Jojo'
         form['email'] = 'm@jojo.com'
         form['password1'] = 'moPass'
         form['password2'] = 'moPass'
         response = form.submit().follow()
-        user = User.objects.get(email='mo@jojo.com')
+        user = User.objects.get(email='m@jojo.com')
         self.assertEqual(user.first_name, 'Mojo')
         self.assertEqual(user.last_name, 'Jojo')
         self.assertFalse(user.is_active)
+        expected_group = Group.objects.get(name='VIP')
+        self.assertIn(expected_group, user.groups.all())
