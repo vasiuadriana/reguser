@@ -1,0 +1,32 @@
+{% extends 'reguser/base.html' %}
+{% load bootstrap %}
+
+{% block content %}
+<div class="container">
+<h1>Your user profile</h1>
+<div>
+    <form class="form" method="POST" action=".">{% csrf_token %}
+        <fieldset>
+            <legend>Basic information</legend>
+            <p>{{ user }}</p>
+            {% comment %}
+            {{ form.first_name|bootstrap }}
+            {{ form.last_name|bootstrap }}
+            {{ form.email|bootstrap }}
+            {{ form.password1|bootstrap }}
+            {{ form.password2|bootstrap }}
+            {% endcomment %}
+        </fieldset>
+        <fieldset>
+            <legend>Extended profile</legend>
+            <div>{{ profile }}</div>
+        </fieldset>
+        <div class="form-group">
+            <div class="col-sm-12">
+                <input type="submit" class="btn btn-primary" value="Edit" />
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+{% endblock %}

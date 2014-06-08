@@ -51,10 +51,14 @@ def reguser_login(request, next='/'):
         pass
     return redirect(next)
 
-def reguser_profile(request):
+def reguser_profile(request, profile_model=None):
+    user = request.user
+    profile = None
+    if profile_model:
+        profile = profile_model.objects.get(user=user)
     if request.method == 'POST':
         # edit profile
         return redirect('reguser-profile')
     else:
-        # show profile 
-        return HttpResponse('user profile')
+        return render(request, 'reguser/edit_profile.html', {
+            'user': user, 'profile': profile})

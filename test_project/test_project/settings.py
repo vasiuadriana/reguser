@@ -52,7 +52,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-AUTHENTICATION_BACKENDS = ('reguser.backends.EmailAuthBackend',)
+AUTHENTICATION_BACKENDS = (
+        'reguser.backends.EmailAuthBackend',
+        'django.contrib.auth.backends.ModelBackend',
+        )
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
@@ -73,6 +76,8 @@ DATABASES = {
         'TEST_NAME': os.path.join(BASE_DIR, 'test.db.sqlite3'),
     }
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
