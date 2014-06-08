@@ -10,3 +10,6 @@ class ReguserURLsTestCase(URLTestCase):
 
     def test_registration_url(self):
         self.assert_url_matches_view(views.registration, self.url_base+'register/', 'reguser-registration')
+
+    def test_activation_url(self):
+        self.assert_url_matches_view(views.activate, self.url_base+'register/activate/', 'reguser-activate')
