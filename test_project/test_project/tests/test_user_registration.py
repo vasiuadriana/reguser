@@ -113,11 +113,13 @@ class RegistrationActivationTestCase(WebTest, WebtestHelperMixin):
         token = self.token+'xxx' # Mangle the signature
         response = self.app.get(self.activation_link, {'t': token}, status=404)
         self.assertEqual(response.status_int, 404)
+        self.assertFalse(response.context['user'].is_authenticated())
 
     def test_f_invalid_username_in_activation_link(self):
         User.objects.get(email=u"mojo@jojo.com").delete()
         response = self.app.get(self.activation_link, {'t': self.token})
         response.mustcontain("register again", reverse("reguser-registration"))
+        self.assertFalse(response.context['user'].is_authenticated())
 
     def test_f_user_already_active(self):
         user = User.objects.get(email=u"mojo@jojo.com")
@@ -125,3 +127,12 @@ class RegistrationActivationTestCase(WebTest, WebtestHelperMixin):
         user.save()
         response = self.app.get(self.activation_link, {'t': self.token})
         response.mustcontain("log in", reverse("reguser-login"))
+        self.assertFalse(response.context['user'].is_authenticated())
+
+    def test_f_activation_successful(self):
+        user = User.objects.get(email=u"mojo@jojo.com")
+        self.assertFalse(user.is_active)
+        response = self.app.get(self.activation_link, {'t': self.token}).follow()
+        user = User.objects.get(email=u"mojo@jojo.com")
+        self.assertTrue(user.is_active)
+        self.assertFalse(response.context['user'].is_authenticated())

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth import authenticate, login
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import BadSignature
 from django.http import HttpResponse, Http404
@@ -23,7 +24,7 @@ def registration(request, whitelist=[], template='registration_form.html',
     context = {'form': form}
     return render(request, 'reguser/' + template, context)
 
-def reguser_activate(request, next='/'):
+def reguser_activate(request, login_on_activation=False, next='/'):
     token = request.GET.get('t')
     helper = ReguserHelper()
     try:
@@ -34,10 +35,26 @@ def reguser_activate(request, next='/'):
         return render(request, 'reguser/activation_expired.html', {})
     if not user:
         return render(request, 'reguser/already_active.html', {})
+    if login_on_activation:
+        from django.conf import settings
+        user = authenticate(username=user.email, password=user.password, passwordless=True)
+        if user:
+            login(request, user)
     return redirect(next)
 
 def reguser_login(request, next='/'):
+    if request.method == 'POST':
+        # authenticate
+        pass
+    else:
+        # return login form
+        pass
     return redirect(next)
 
 def reguser_profile(request):
-    return HttpResponse('user profile')
+    if request.method == 'POST':
+        # edit profile
+        return redirect('reguser-profile')
+    else:
+        # show profile 
+        return HttpResponse('user profile')
