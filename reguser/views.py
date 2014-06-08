@@ -15,9 +15,10 @@ def registration(request, whitelist=[], template='registration_form.html',
                     form.cleaned_data['email'], form.cleaned_data['password1'], groups=groups, 
                     attrs = {'first_name': form.cleaned_data['first_name'],
                         'last_name': form.cleaned_data['last_name']})
+            activation_link = reverse(activation_url_name) + '?t=' + user.activation_token
             subject = render_to_string('reguser/activation_email_subject.txt', {'user': user}).strip()
             msg = render_to_string('reguser/activation_email_body.txt', {'user': user, 
-                                                'activation_link': reverse(activation_url_name)})
+                                                'activation_link': activation_link})
             user.email_user(subject, msg)
             return redirect(next)
     else:

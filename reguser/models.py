@@ -21,7 +21,7 @@ class ReguserHelper(object):
         for group_name in groups:
             group, created = Group.objects.get_or_create(name=group_name)
             group.user_set.add(user)
-        user.activation_token = self.signer.sign(user.pk)
+        user.activation_token = self.signer.sign(user.username)
         return user
 
     def validate_activation_token(self, token):
@@ -29,8 +29,7 @@ class ReguserHelper(object):
         Raises BadSignature if the token is invalid. Raises ObjectDoesNotExist 
         if no user with the decoded ID exists in the database. Returns None if 
         the user exists but is already active. """
-        user_pk = self.signer.unsign(token)
-        user = self.USER_MODEL.objects.get(pk=user_pk)
+        user = self.USER_MODEL.objects.get(username=self.signer.unsign(token))
         if user.is_active: return None
         user.is_active = True
         user.save()

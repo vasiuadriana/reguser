@@ -1,6 +1,6 @@
 Dear {{ user.first_name|capfirst }},
 
-Thank for registering on our website! 
+Thank you for registering on our website! 
 
 To activate your registration, please follow this link (either click on it directly or copy and paste it into your browser): {{ activation_link }}
 

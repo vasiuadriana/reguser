@@ -91,8 +91,11 @@ class RegistrationTestCase(WebTest):
     def test_f_when_valid_form_is_submitted_activation_email_is_sent(self):
         form = self.registration_page.form
         self.fill_in_form(form)
-        response = form.submit().follow()
+        response = form.submit()
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertIn('mojo@jojo.com', msg.to)
         self.assertEqual(msg.subject, u"Mojo, activate your registration!")
+        self.assertTemplateUsed(response, "reguser/activation_email_subject.txt")
+        self.assertTemplateUsed(response, "reguser/activation_email_body.txt")
+        print msg.body
