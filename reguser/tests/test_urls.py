@@ -12,4 +12,10 @@ class ReguserURLsTestCase(URLTestCase):
         self.assert_url_matches_view(views.registration, self.url_base+'register/', 'reguser-registration')
 
     def test_activation_url(self):
-        self.assert_url_matches_view(views.activate, self.url_base+'register/activate/', 'reguser-activate')
+        self.assert_url_matches_view(views.reguser_activate, self.url_base+'register/activate/', 'reguser-activate')
+    
+    def test_login_url(self):
+        self.assert_url_matches_view(views.reguser_login, self.url_base+'login/', 'reguser-login')
+    
+    def test_user_profile_url(self):
+        self.assert_url_matches_view(views.reguser_profile, self.url_base+'profile/', 'reguser-profile')

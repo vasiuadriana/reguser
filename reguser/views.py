@@ -23,7 +23,7 @@ def registration(request, whitelist=[], template='registration_form.html',
     context = {'form': form}
     return render(request, 'reguser/' + template, context)
 
-def activate(request, next='/'):
+def reguser_activate(request, next='/'):
     token = request.GET.get('t')
     helper = ReguserHelper()
     try:
@@ -35,3 +35,9 @@ def activate(request, next='/'):
     if not user:
         return render(request, 'reguser/already_active.html', {})
     return redirect(next)
+
+def reguser_login(request, next='/'):
+    return redirect(next)
+
+def reguser_profile(request):
+    return HttpResponse('user profile')
