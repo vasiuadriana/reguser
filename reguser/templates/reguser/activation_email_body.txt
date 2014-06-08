@@ -2,7 +2,7 @@ Dear {{ user.first_name|capfirst }},
 
 Thank you for registering on our website! 
 
-To activate your registration, please follow this link (either click on it directly or copy and paste it into your browser): {{ activation_link }}
+To activate your registration, please follow this link (either click on it directly or copy and paste it into your browser): http://{{ site.domain }}{{ activation_link }}
 
 If you didn't request this registration, please ignore this e-mail. Your registration will not be activated and our website will forget all about it in within 7 days. 
 
