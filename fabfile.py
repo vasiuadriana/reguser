@@ -6,7 +6,7 @@ TEST_PROJECT_DIR = os.path.join(os.path.dirname(env.real_fabfile), 'test_project
 def test():
     with lcd(TEST_PROJECT_DIR):
         local("coverage run --source='../reguser/' manage.py test -v 2 ")
-        local("coverage report")
+        local("coverage report --omit=../reguser/management/*")
 
 def run_server():
     with lcd(TEST_PROJECT_DIR):
