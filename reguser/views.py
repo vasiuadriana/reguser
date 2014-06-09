@@ -53,10 +53,10 @@ def reguser_password_reset(request, template='reguser/password_reset_form.html',
             email_template_name=email_template, subject_template_name=email_subject_template,
             post_reset_redirect=reverse(next))
 
-def reguser_password_reset_confirm(request, uidb36=None, token=None,
+def reguser_password_reset_confirm(request, uidb64=None, token=None,
         template = 'reguser/password_reset_confirm.html', next='login'):
     return password_reset_confirm(request, template_name=template, 
-            uidb36=uidb36, token=token, post_reset_redirect=reverse(next))
+            uidb64=uidb64, token=token, post_reset_redirect=reverse(next))
 
 
 def reguser_profile(request, profile_model=None):  #pragma: nocover

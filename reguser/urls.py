@@ -8,7 +8,7 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'django.contrib.auth.views.logout', name='logout', 
         kwargs={'next_page': '/'}),
     url(r'^reset/$', 'reguser.views.reguser_password_reset', name='password-reset'),
-    url(r'^reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+    url(r'^reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
                 'reguser.views.reguser_password_reset_confirm', name='password-reset-confirm'),
     url(r'^profile/$', 'reguser.views.reguser_profile', name='reguser-profile'),
 )
