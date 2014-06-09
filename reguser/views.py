@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
+from django.core.urlresolvers import reverse
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.views import password_reset, password_reset_confirm
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import BadSignature
 from django.http import HttpResponse, Http404
@@ -42,6 +44,19 @@ def reguser_activate(request, login_on_activation=False, next='/'):
         if user:
             login(request, user)
     return redirect(next)
+
+
+def reguser_password_reset(request, template='reguser/password_reset_form.html',
+        email_template = 'reguser/password_reset_email.html',
+        email_subject_template = 'reguser/password_reset_subject.txt', next='login'):
+    return password_reset(request, template_name=template, 
+            email_template_name=email_template, subject_template_name=email_subject_template,
+            post_reset_redirect=reverse(next))
+
+def reguser_password_reset_confirm(request, uidb36=None, token=None,
+        template = 'reguser/password_reset_confirm.html', next='login'):
+    return password_reset_confirm(request, template_name=template, 
+            uidb36=uidb36, token=token, post_reset_redirect=reverse(next))
 
 
 def reguser_profile(request, profile_model=None):  #pragma: nocover
