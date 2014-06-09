@@ -126,7 +126,7 @@ class RegistrationActivationTestCase(WebTest, WebtestHelperMixin):
         user.is_active = True
         user.save()
         response = self.app.get(self.activation_link, {'t': self.token})
-        response.mustcontain("log in", reverse("reguser-login"))
+        response.mustcontain("log in", reverse("login"))
         self.assertFalse(response.context['user'].is_authenticated())
 
     def test_f_activation_successful(self):

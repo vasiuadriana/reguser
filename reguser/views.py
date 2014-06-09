@@ -24,6 +24,7 @@ def registration(request, whitelist=[], template='registration_form.html',
     context = {'form': form}
     return render(request, 'reguser/' + template, context)
 
+
 def reguser_activate(request, login_on_activation=False, next='/'):
     token = request.GET.get('t')
     helper = ReguserHelper()
@@ -42,16 +43,8 @@ def reguser_activate(request, login_on_activation=False, next='/'):
             login(request, user)
     return redirect(next)
 
-def reguser_login(request, next='/'):
-    if request.method == 'POST':
-        # authenticate
-        pass
-    else:
-        # return login form
-        pass
-    return redirect(next)
 
-def reguser_profile(request, profile_model=None):
+def reguser_profile(request, profile_model=None):  #pragma: nocover
     user = request.user
     profile = None
     if profile_model:
