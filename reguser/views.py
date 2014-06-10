@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.views import password_reset, password_reset_confirm, password_change
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.views import password_reset, password_reset_confirm
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import BadSignature
 from django.http import HttpResponse, Http404
@@ -58,6 +58,10 @@ def reguser_password_reset_confirm(request, uidb64=None, token=None,
     return password_reset_confirm(request, template_name=template, 
             uidb64=uidb64, token=token, post_reset_redirect=reverse(next))
 
+def reguser_password_change(request, 
+        template='reguser/password_change_form.html', next='login'):
+    return password_change(request, template_name=template, 
+            post_change_redirect=reverse(next))
 
 def reguser_profile(request, profile_model=None):  #pragma: nocover
     user = request.user

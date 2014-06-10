@@ -10,5 +10,6 @@ urlpatterns = patterns('',
     url(r'^reset/$', 'reguser.views.reguser_password_reset', name='password-reset'),
     url(r'^reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
                 'reguser.views.reguser_password_reset_confirm', name='password-reset-confirm'),
+    url(r'^change/$', 'reguser.views.reguser_password_change', name='password-change'),
     url(r'^profile/$', 'reguser.views.reguser_profile', name='reguser-profile'),
 )
