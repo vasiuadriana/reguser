@@ -65,6 +65,7 @@ class RegistrationTestCase(WebTest, WebtestHelperMixin):
             User.objects.get(email='mojo@jojo.com')
         self.fill_in_form(form)
         response = form.submit().follow()
+        response.mustcontain("Thank you for your registration request. Please check your e-mail.")
         user = User.objects.get(email='mojo@jojo.com')
         self.assertEqual(user.first_name, u"Mojo")
         self.assertEqual(user.last_name, u"Джоджо")

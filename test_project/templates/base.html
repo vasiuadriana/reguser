@@ -32,6 +32,15 @@
                 </div>
             </div>
         </nav>
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
         {% block content %}{% endblock %}
 
         <!-- JavaScript placed at the end of the document so the pages load faster -->

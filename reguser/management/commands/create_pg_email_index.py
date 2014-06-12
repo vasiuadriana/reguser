@@ -14,3 +14,10 @@ class Command(BaseCommand):
             print e
         except ProgrammingError, e:
             print e
+        try:
+            cursor.execute("ALTER TABLE auth_user ADD CONSTRAINT auth_user_unique_email_constraint UNIQUE (email)")
+            print "Created unique constraint for email field."
+        except OperationalError, e:
+            print e
+        except ProgrammingError, e:
+            print e

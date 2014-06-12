@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.views import password_reset, password_reset_confirm, password_change
 from django.contrib.auth import authenticate, login
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import BadSignature
-from django.http import HttpResponse, Http404
+from django.contrib import messages
+from django.http import Http404
 from reguser.forms import ExtendedUserCreationForm
 from reguser.models import ReguserHelper
 
@@ -20,6 +22,7 @@ def registration(request, whitelist=[], template='registration_form.html',
                     attrs = {'first_name': form.cleaned_data['first_name'],
                         'last_name': form.cleaned_data['last_name']})
             helper.email_activation_link(get_current_site(request), user, activation_url_name)
+            messages.info(request, _("Thank you for your registration request. Please check your e-mail. "))
             return redirect(next)
     else:
         form = ExtendedUserCreationForm(ALLOWED_EMAIL_DOMAINS=whitelist)
@@ -43,6 +46,7 @@ def reguser_activate(request, login_on_activation=False, next='/'):
         user = authenticate(username=user.email, password=user.password, passwordless=True)
         if user:
             login(request, user)
+    messages.info(request, _("Your account is now active!"))
     return redirect(next)
 
 
