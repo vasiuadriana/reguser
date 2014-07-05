@@ -92,3 +92,10 @@ class ExtendedUserCreationForm(UserCreationForm):
                 user.save()
         return user
 
+class AcceptTermsUserCreationForm(ExtendedUserCreationForm):
+    accept_terms = forms.BooleanField(required = True, label = _(""), help_text=_("I accept the terms and conditions"))
+
+    class Meta:
+        from django.contrib.auth import get_user_model
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'email', 'password1', 'password2', 'username', 'accept_terms']

@@ -8,13 +8,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import BadSignature
 from django.contrib import messages
 from django.http import Http404
-from reguser.forms import ExtendedUserCreationForm
+from reguser.forms import ExtendedUserCreationForm, AcceptTermsUserCreationForm
 from reguser.models import ReguserHelper
 
 def registration(request, whitelist=[], template='registration_form.html', 
-        activation_url_name='reguser-activate', groups=[], next='/'):
+        activation_url_name='reguser-activate', groups=[], accept_terms=False, next='/'):
+    FORM = AcceptTermsUserCreationForm if accept_terms else ExtendedUserCreationForm
     if request.method == 'POST':
-        form = ExtendedUserCreationForm(request.POST, ALLOWED_EMAIL_DOMAINS=whitelist)
+        form = FORM(request.POST, ALLOWED_EMAIL_DOMAINS=whitelist)
         if form.is_valid():
             helper = ReguserHelper()
             user = helper.create_inactive_user(form.cleaned_data['username'],
@@ -25,7 +26,7 @@ def registration(request, whitelist=[], template='registration_form.html',
             messages.info(request, _("Thank you for your registration request. Please check your e-mail. "))
             return redirect(next)
     else:
-        form = ExtendedUserCreationForm(ALLOWED_EMAIL_DOMAINS=whitelist)
+        form = FORM(ALLOWED_EMAIL_DOMAINS=whitelist)
     context = {'form': form}
     return render(request, 'reguser/' + template, context)
 
