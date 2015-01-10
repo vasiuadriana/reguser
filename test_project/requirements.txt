@@ -8,4 +8,4 @@ django-webtest
 model_mommy
 django-bootstrap-form
 
--e git+git@github.com:a115/django-lunchbag.git#egg=django-lunchbag
+-e git+https://github.com/a115/django-lunchbag.git#egg=django-lunchbag
